@@ -22,8 +22,11 @@
 
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QIcon
 from PySide6.QtWidgets import *
-from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6 import QtCore, QtWidgets
+import hard_definitions
 
+# TODO: add ToolTip Hints
+# Update Interface Design
 
 class VideoPipelineMainInterface(QMainWindow):
 
@@ -36,7 +39,7 @@ class VideoPipelineMainInterface(QMainWindow):
         self.setBaseSize(1280, 720)
         self.setMinimumSize(800, 600)
         self.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint & QtCore.Qt.WindowMaximizeButtonHint)
-        self.setWindowTitle("your title here")
+        self.setWindowTitle(self.tr("VideoPipeline Version") + f" - {hard_definitions.VERSION}")
 
         self.the_main_widget = QWidget()
         self.setCentralWidget(self.the_main_widget)
@@ -48,26 +51,27 @@ class VideoPipelineMainInterface(QMainWindow):
         lay_right_form = QGridLayout()  # was form layout which it basically is
         # left side widgets
         self.w_schedule_view = QColumnView()
-        self.w_btn_schedule_start = QPushButton("Start", MaximumWidth=100)
-        self.w_btn_schedule_stop = QPushButton("Stop", MaximumWidth=100)
-        self.w_btn_schedule_abort = QPushButton("Abort", MaximumWidth=100)
-        self.w_btn_schedule_delete = QPushButton("Delete", MaximumWidth=100)
+        self.w_btn_schedule_start = QPushButton(self.tr("Start"), MaximumWidth=100)
+        self.w_btn_schedule_stop = QPushButton(self.tr("Stop"), MaximumWidth=100)
+        self.w_btn_schedule_abort = QPushButton(self.tr("Abort"), MaximumWidth=100)
+        self.w_btn_schedule_delete = QPushButton(self.tr("Delete"), MaximumWidth=100)
         # right side widgets
         self.w_input_file_name = QLineEdit(ReadOnly=True, MinimumWidth=200)
         self.w_input_file_name.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
-        self.w_input_file_btn = QPushButton("Load")
+        self.w_input_file_btn = QPushButton(self.tr("Load"))
         self.w_project_combo = QComboBox(MinimumWidth=200)
         self.w_project_combo.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         self.w_project_btn = QPushButton("...")
         self.w_encoder_combo = QComboBox(MinimumWidth=200)
         self.w_encoder_combo.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         self.w_encoder_btn = QPushButton("...")  # QToolButton for (edit as new, edit)
-        self.w_video_preview = QLabel(f"")  # who would have thought that labels are the primary image widget Oo
+        self.w_video_preview = QLabel()  # who would have thought that labels are the primary image widget Oo
         self.w_details_tabs = QTabWidget()
         self.w_details_project = QWidget()
         self.w_details_encoding = QWidget()
         self.w_details_variables = QWidget()
         self.w_details_schedules = QWidget()
+        self.w_details_mediainfo = QWidget()
 
         # +++ tabs - project
         self.w_proj_title = QLineEdit()
@@ -86,18 +90,19 @@ class VideoPipelineMainInterface(QMainWindow):
                                           Maximum=510, Minimum=0, tickInterval=10, TickPosition=QSlider.TicksBothSides)
         self.w_enc_video_quality = QDoubleSpinBox(singleStep=0.1, Decimals=1, Maximum=51, Minimum=0)
         self.w_enc_video_rescale = QComboBox()
-        self.w_enc_video_rescale.addItems(["720x1280", "1080x1920", "1440x2560", "2160x3840"])
-        self.w_enc_video_frame_reduce = QCheckBox("Reduce to 30 fps")
+        self.w_enc_video_rescale.addItems([""]+hard_definitions.rescale_presets)
+        self.w_enc_video_frame_reduce = QCheckBox(self.tr("Reduce to 30 fps"))
         self.w_enc_audio_codec = QComboBox(Disabled=True)
         self.w_enc_audio_codec.addItems(["vorbis"])
-        self.w_enc_audio_archive = QCheckBox("Archive Audio")
+        self.w_enc_audio_archive = QCheckBox(self.tr("Archive Audio"))
         # vorbis audio quality goes from 0 to 10
         self.w_enc_audio_slider = QSlider(orientation=QtCore.Qt.Orientation.Horizontal, singleStep=1, PageStep=10,
                                           Maximum=100, Minimum=10, tickInterval=10, TickPosition=QSlider.TicksBothSides)
         self.w_enc_audio_quality = QDoubleSpinBox(singleStep=0.1, Decimals=1, Maximum=10, Minimum=1)
 
         # +++ tabs - variables
-        self.w_variables_table = QTableWidget(ColumnCount=2, HorizontalHeaderLabels=["Variable", "Value"])
+        self.w_variables_table = QTableWidget(ColumnCount=2,
+                                              HorizontalHeaderLabels=[self.tr("Variable"), self.tr("Value")])
         self.w_variables_table.verticalHeader().setVisible(False)
         self.w_variables_table.horizontalHeader().setStretchLastSection(True)
         self.w_variables_table.horizontalHeader().setSectionsClickable(False)
@@ -134,25 +139,26 @@ class VideoPipelineMainInterface(QMainWindow):
         lay_right_form.addWidget(self.w_video_preview, 3, 0, 3, 1)
 
         lay_right_side.addWidget(self.w_details_tabs)
-        self.w_details_tabs.addTab(self.w_details_project, "Project")
-        self.w_details_tabs.addTab(self.w_details_encoding, "Encoding")
-        self.w_details_tabs.addTab(self.w_details_variables, "Variables")
-        self.w_details_tabs.addTab(self.w_details_schedules, "Schedule")
+        self.w_details_tabs.addTab(self.w_details_project, self.tr("Project"))
+        self.w_details_tabs.addTab(self.w_details_encoding, self.tr("Encoding"))
+        self.w_details_tabs.addTab(self.w_details_variables, self.tr("Variables"))
+        self.w_details_tabs.addTab(self.w_details_schedules, self.tr("Schedule"))
+        self.w_details_tabs.addTab(self.w_details_mediainfo, self.tr("Media Info"))
 
         # ### tabbed view ###
         # +++ project tab - i like those group frames but making them on the fly is somewhat annoying
         proj_lay = QVBoxLayout()
-        temp = QGroupBox("title")
+        temp = QGroupBox(self.tr("Title"))
         temp2 = QHBoxLayout()
         temp2.addWidget(self.w_proj_title)
         temp.setLayout(temp2)
         proj_lay.addWidget(temp)
-        temp = QGroupBox("Description")
+        temp = QGroupBox(self.tr("Description"))
         temp2 = QHBoxLayout()
         temp2.addWidget(self.w_proj_desc)
         temp.setLayout(temp2)
         proj_lay.addWidget(temp)
-        temp = QGroupBox("Tags")
+        temp = QGroupBox(self.tr("Tags"))
         temp2 = QHBoxLayout()
         temp2.addWidget(self.w_proj_tags)
         temp.setLayout(temp2)

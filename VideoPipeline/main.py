@@ -22,10 +22,15 @@
 
 import sys
 from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QTranslator
 from gui_logic import VideoPipelineGui
 
 if __name__ == "__main__":
     anApp = QApplication(sys.argv)
+    i18n = QTranslator()
+    i18n.load("VideoPipeline")
+    anApp.installTranslator(i18n)
+
     main = VideoPipelineGui()
     main.show()
     try:

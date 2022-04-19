@@ -21,6 +21,7 @@
 # @license GPL-3.0-only <https://www.gnu.org/licenses/gpl-3.0.en.html>
 
 from gui_design import VideoPipelineMainInterface
+from encoder_presets import EncoderPresetDialogue
 
 
 class VideoPipelineGui(VideoPipelineMainInterface):
@@ -37,6 +38,15 @@ class VideoPipelineGui(VideoPipelineMainInterface):
         self.w_enc_video_quality.valueChanged.connect(self.a_video_quality_sync)
         self.w_enc_audio_slider.valueChanged.connect(self.a_audio_slider_sync)
         self.w_enc_audio_quality.valueChanged.connect(self.a_audio_quality_sync)
+        self.w_enc_preset_new.clicked.connect(self.test)
+
+    def test(self):
+        bla = EncoderPresetDialogue(encoder_preset={}, parent=self)
+        if bla.exec():
+            print(bla.get_data())
+            blo = EncoderPresetDialogue(encoder_preset=bla.get_data(), parent=self)
+            blo.exec()
+
 
     def a_video_slider_sync(self):
         """
