@@ -39,6 +39,17 @@ vp_aud_stream0_boost = 0  # volume adjustment of stream 0 in dB
 vp_aud_stream1_boost = 0  # volume adjustment of stream 1 in dB
 vp_aud_quality = 7.0  # quality target for ogg-vorbis encoding
 
+vk_translate_to_preset = {
+        'vid_src': vp_vid_stream,
+        'vid_quality': vp_vid_crf,
+        'aud_src1': vp_aud_stream0,
+        'aud_src2': vp_aud_stream1,
+        'aud_quality': vp_aud_quality,
+        'aud_adj1': vp_aud_stream0_boost,
+        'aud_adj2': vp_aud_stream1_boost,
+        'aud_archive': False
+    }
+
 project_file_video_makeup = {'stream': 'v_stream', 'crf': 'v_crf', 'g': 'v_g', 'bf': 'v_bf', 'scaling_w': 'scaling_w'}
 project_file_audio_makeup = {'stream0': 'a_0', 'stream1': 'a_1', 'stream0_boost': 'a_0db', 'stream1_boost': 'a_1db',
                              'quality': 'a_q'}

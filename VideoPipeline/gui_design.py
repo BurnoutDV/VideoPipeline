@@ -40,6 +40,7 @@ class VideoPipelineMainInterface(QMainWindow):
         self.setMinimumSize(800, 600)
         self.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint & QtCore.Qt.WindowMaximizeButtonHint)
         self.setWindowTitle(self.tr("VideoPipeline Version") + f" - {hard_definitions.VERSION}")
+        self.setAcceptDrops(True)
 
         self.the_main_widget = QWidget()
         self.setCentralWidget(self.the_main_widget)
@@ -48,7 +49,7 @@ class VideoPipelineMainInterface(QMainWindow):
         lay_left_side = QVBoxLayout()
         lay_left_btn = QHBoxLayout()
         lay_right_side = QVBoxLayout()
-        lay_right_form = QGridLayout()  # was form layout which it basically is
+        lay_right_lay = QVBoxLayout()  # was form layout which it basically is
         # left side widgets
         self.w_schedule_view = QColumnView()
         self.w_btn_schedule_start = QPushButton(self.tr("Start"), MaximumWidth=100)
@@ -65,7 +66,10 @@ class VideoPipelineMainInterface(QMainWindow):
         self.w_encoder_combo = QComboBox(MinimumWidth=200)
         self.w_encoder_combo.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         self.w_encoder_btn = QPushButton("...")  # QToolButton for (edit as new, edit)
-        self.w_video_preview = QLabel()  # who would have thought that labels are the primary image widget Oo
+        # who would have thought that labels are the primary image widget Oo
+        self.w_video_preview1 = QLabel(BaseSize=QtCore.QSize(355, 200))
+        self.w_video_preview2 = QLabel(BaseSize=QtCore.QSize(355, 200))
+        self.w_video_preview3 = QLabel(BaseSize=QtCore.QSize(355, 200))
         self.w_details_tabs = QTabWidget()
         self.w_details_project = QWidget()
         self.w_details_encoding = QWidget()
@@ -129,14 +133,28 @@ class VideoPipelineMainInterface(QMainWindow):
         lay_left_side.addLayout(lay_left_btn)
 
         # right side
-        lay_right_side.addLayout(lay_right_form)
-        lay_right_form.addWidget(self.w_input_file_name, 0, 0, alignment=QtCore.Qt.AlignLeft)
-        lay_right_form.addWidget(self.w_input_file_btn, 0, 1)
-        lay_right_form.addWidget(self.w_project_combo, 1, 0, alignment=QtCore.Qt.AlignLeft)
-        lay_right_form.addWidget(self.w_project_btn, 1, 1)
-        lay_right_form.addWidget(self.w_encoder_combo, 2, 0, alignment=QtCore.Qt.AlignLeft)
-        lay_right_form.addWidget(self.w_encoder_btn, 2, 1)
-        lay_right_form.addWidget(self.w_video_preview, 3, 0, 3, 1)
+        lay_right_side.addLayout(lay_right_lay)
+        _ = QHBoxLayout()
+        _.addWidget(self.w_input_file_name)
+        _.addWidget(self.w_input_file_btn)
+        lay_right_lay.addLayout(_)
+        _ = QHBoxLayout()
+        _.addWidget(self.w_project_combo)
+        _.addWidget(self.w_project_btn)
+        lay_right_lay.addLayout(_)
+        _ = QHBoxLayout()
+        _.addWidget(self.w_encoder_combo)
+        _.addWidget(self.w_encoder_btn)
+        lay_right_lay.addLayout(_)
+        preview_scroll = QScrollArea()
+        preview_container = QHBoxLayout()
+        preview_container.addStretch(10)
+        preview_container.addWidget(self.w_video_preview1)
+        preview_container.addWidget(self.w_video_preview2)
+        preview_container.addWidget(self.w_video_preview3)
+        preview_container.addStretch(10)
+        preview_scroll.setLayout(preview_container)
+        lay_right_lay.addWidget(preview_scroll)
 
         lay_right_side.addWidget(self.w_details_tabs)
         self.w_details_tabs.addTab(self.w_details_project, self.tr("Project"))

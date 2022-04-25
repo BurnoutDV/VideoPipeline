@@ -70,3 +70,16 @@ This plan mentions some things i haven't yet explained. More words then. As of n
 * interface logic that does not result in unstable/unusable states, needs some fine handling of the situation, might be tiresome to get it just right
 * spaghetti code, this is my fourth project where i try to keep a somewhat clear package structure and i still feel like i am a child in big boots.
 * find a bloody name for the thing, 70% chance that "VideoPipeline" will be it (Leonardo of Quirm called and wants his quirks back)
+
+### FFMPEG Magic
+
+Some quick reference things that one can use with ffmpeg
+
+* `ffmpeg -noaccurate_seek -i $file -vf "select='not(mod(t,$play_time/3))'" -vsync vfr thumb_%1d.jpg`
+  Creates 3 Thumbnails, needs to get length with ffprobe before, seemed somewhat slow, stolen from [Stackoverflow](https://stackoverflow.com/a/61898237)
+*  `ffmpeg -y -ss $time_point -i $file -ss 00:00:15 -s 1280x720 -vcodec png -vframes 1 -an $out`
+  Creates a single still frame as png of the specifed time searched by keyframe, `-an` makes it ignore the audio track(s)
+* `ffmpeg -y -i $file -c:v libx264 -crf 22.5 $out`
+  simply encodes the given file to H.264 codec using x264, copying audio track
+* `ffmpeg -i $file -c:v libx264 -c:a ogg -crf 22.5 -filter_complex '[0:v:0]resize:2560,1440,method=lanczos:param_a=4-[out_v]' -filter_complex '[0:a:1][0:a:2]amix=2:longest:weights=1 2[out_a]' -map [out_v] -map [out_a] -map [0:v:1] -map [0:v:2] $out`
+  This is what i want to do. It takes the video track, upscales it to QWHD using Lanczos4 by x264 (upscaling is optional, only ever necessary once), then it takes two audio tracks from track 2 and 3 and mixes them together (track 3 twice as loud/6dB) and then muxes it all together to one file with 4 tracks, where the first two are video and muxed audio and the other two the original audio (not copied but encoded to ogg as audio format has to be uniform)
